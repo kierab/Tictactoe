@@ -14,6 +14,7 @@ import java.util.Random;
 import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.RED;
 
+
 public class Game extends Application {
     public Game(){}
 
@@ -29,15 +30,14 @@ public class Game extends Application {
     private static final int SQUARE_SIDE = 100;
     private static final int PADDING = 100;
 
-    double placeX, placeY; // x and y of where the symbol is being placed
     double mouseX, mouseY; // where the mouse is clicked
 
     public STATES turn;
-    public String turnString;
+    public String turnString; //whos turn isit
 
     Text showturn = new Text(turnString() + "'s turn"); // show which player turn it is
 
-    public STATES[][] placements = new STATES[3][3];
+    public STATES[][] placements = new STATES[3][3]; //array of the board
 
     public boolean gameOver;
 
@@ -138,8 +138,6 @@ public class Game extends Application {
         showturn.setFont(new Font(20));
         board.getChildren().add(showturn);
 
-
-
         scene.setOnMousePressed(event -> {
             mouseX = event.getSceneX();
             mouseY = event.getSceneY();
@@ -156,7 +154,7 @@ public class Game extends Application {
 
                 checkState(); //output in console the state of the board according to placements array
 
-                //output in console if someone wins
+                //when win condition
                 if (!(checkWin().equals(""))){
                     System.out.println(checkWin() + " wins");
                     Line winline = new Line();
@@ -169,8 +167,10 @@ public class Game extends Application {
                     moves.getChildren().add(winline);
                     showturn.setText(checkWin() + " wins");
                 }
+                else System.out.println("no winner yet");
             }
         });
+
 
     }
 
@@ -187,6 +187,7 @@ public class Game extends Application {
             if (placements[y][0] == placements[y][1] && placements[y][1] == placements[y][2]) {
                 winner = stateToString(placements[y][0]);
                 winstring = y+"0"+y+"2";
+                break;
             }
         }
         //check verticals
@@ -194,6 +195,7 @@ public class Game extends Application {
             if (placements[0][x] == placements[1][x] && placements[1][x] == placements[2][x]) {
                 winner = stateToString(placements[0][x]);
                 winstring = "0"+x+"2"+x;
+                break;
             }
         }
         //check diagonals
