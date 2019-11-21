@@ -6,6 +6,10 @@
         <option name="keyStoreUrl" value="file://" />
       </options>
     </properties>
-    <root id="archive" name="unnamed.apk" />
+    <root id="archive" name="unnamed.apk">
+      <element id="directory" name="folder">
+        <element id="artifact" artifact-name="Cheese:jar" />
+      </element>
+    </root>
   </artifact>
 </component>

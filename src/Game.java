@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import java.util.Random;
 
 import static javafx.scene.paint.Color.BLACK;
+import static javafx.scene.paint.Color.RED;
 
 public class Game extends Application {
     public Game(){}
@@ -34,7 +35,11 @@ public class Game extends Application {
     public STATES turn;
     public String turnString;
 
+    Text showturn = new Text(turnString() + "'s turn"); // show which player turn it is
+
     public STATES[][] placements = new STATES[3][3];
+
+    public boolean gameOver;
 
 
     //game methods
@@ -75,14 +80,24 @@ public class Game extends Application {
         restart.setLayoutX(PADDING+1.5*SQUARE_SIDE);
         restart.setLayoutY(PADDING/2);
 
+
         board.getChildren().addAll(r,y1,y2,x1,x2,restart);
     }
+
 
     public void newGame() {
         clear();
         randomTurn();
         setBoard();
         checkState();
+        showturn.setText(turnString() + "'s turn");
+
+    }
+
+    public String stateToString(STATES state) {
+        if (state == STATES.X) return "X";
+        else if (state == STATES.O) return "O";
+        else return "empty";
     }
 
     public String turnString() {
@@ -97,11 +112,8 @@ public class Game extends Application {
 
     }
 
-
-
     public boolean checkFree(int x, int y) {
-        if (placements[y][x] != STATES.EMPTY) return false;
-        else return true;
+        return (placements[y][x] == STATES.EMPTY);
     }
 
     public void checkState() {
@@ -114,9 +126,20 @@ public class Game extends Application {
         }
     }
 
+
+
     public void runGame() {
         clear();
         randomTurn();
+
+        //shows which player's turn it is
+        showturn.setLayoutX((PADDING+1.5*SQUARE_SIDE));
+        showturn.setLayoutY(PADDING/4);
+        showturn.setFont(new Font(20));
+        board.getChildren().add(showturn);
+
+
+
         scene.setOnMousePressed(event -> {
             mouseX = event.getSceneX();
             mouseY = event.getSceneY();
@@ -129,18 +152,64 @@ public class Game extends Application {
                 move.setFont(new Font(40));
                 changeTurn();
                 moves.getChildren().add(move);
+                showturn.setText(turnString() + "'s turn");
 
-                //toString
-                checkState();
+                checkState(); //output in console the state of the board according to placements array
+
+                //output in console if someone wins
+                if (!(checkWin().equals(""))){
+                    System.out.println(checkWin() + " wins");
+                    Line winline = new Line();
+                    winline.setStartX(PADDING + SQUARE_SIDE/2 + SQUARE_SIDE * Character.getNumericValue(winstring.charAt(1)));
+                    winline.setStartY(PADDING + SQUARE_SIDE/2 + SQUARE_SIDE * Character.getNumericValue(winstring.charAt(0)));
+                    winline.setEndX(PADDING + SQUARE_SIDE/2 + SQUARE_SIDE * Character.getNumericValue(winstring.charAt(3)));
+                    winline.setEndY(PADDING + SQUARE_SIDE/2 + SQUARE_SIDE * Character.getNumericValue(winstring.charAt(2)));
+                    winline.setStrokeWidth(5);
+                    winline.setStroke(RED);
+                    moves.getChildren().add(winline);
+                    showturn.setText(checkWin() + " wins");
+                }
             }
-
         });
 
     }
 
     //game rules (logic)
     //win conditions
-    //add small text on top saying whos turnitis
+
+
+    String winstring;
+
+    public String checkWin() {
+        String winner = "";
+        //check horizontals
+        for (int y=0; y <3; y++) {
+            if (placements[y][0] == placements[y][1] && placements[y][1] == placements[y][2]) {
+                winner = stateToString(placements[y][0]);
+                winstring = y+"0"+y+"2";
+            }
+        }
+        //check verticals
+        for (int x =0;x<3;x++) {
+            if (placements[0][x] == placements[1][x] && placements[1][x] == placements[2][x]) {
+                winner = stateToString(placements[0][x]);
+                winstring = "0"+x+"2"+x;
+            }
+        }
+        //check diagonals
+        if (placements[0][0]==placements[1][1] && placements[1][1] ==placements[2][2]) {
+            winner = stateToString(placements[0][0]);
+            winstring = "0022";
+        }
+        if (placements[0][2]==placements[1][1] && placements[1][1] ==placements[2][0]) {
+            winner = stateToString(placements[0][2]);
+            winstring = "0220";
+        }
+
+        if (winner.equals("empty")) return "";
+        else return winner;
+    }
+
 
 
 
